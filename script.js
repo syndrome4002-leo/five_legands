@@ -72,6 +72,25 @@ document.querySelectorAll("[data-magnet]").forEach((el) => {
   });
 });
 
+/* ── Subtle 3D tilt on photo cards ─────────────────────── */
+document.querySelectorAll("[data-tilt]").forEach((card) => {
+  const inner = card.querySelector(".hero-photo-mask, .m-photo-mask");
+  if (!inner) return;
+  card.addEventListener("mousemove", (e) => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    gsap.to(inner, {
+      rotationY: x * 7, rotationX: -y * 7,
+      transformPerspective: 1000,
+      duration: 0.6, ease: "power3.out",
+    });
+  });
+  card.addEventListener("mouseleave", () => {
+    gsap.to(inner, { rotationY: 0, rotationX: 0, duration: 0.9, ease: "power3.out" });
+  });
+});
+
 /* ── Progress rail ─────────────────────────────────────── */
 gsap.set(".rail-fill", { scaleX: 0, transformOrigin: "left center" });
 gsap.to(".rail-fill", {
@@ -110,12 +129,26 @@ heroTl
   .to(".display .char", {
     y: 0, opacity: 1, duration: 1.2, ease: "expo.out", stagger: 0.06,
   }, "-=0.6")
+  .to(".hero-photo-mask", {
+    scale: 1, rotate: 0, duration: 1.4, ease: "expo.out",
+  }, "-=0.7")
+  .to(".hero-photo-mask img", {
+    scale: 1.06, duration: 3.5, ease: "sine.out",
+  }, "-=1.2")
+  .to(".hero-stamp", {
+    opacity: 1, scale: 1, rotate: -8, duration: 0.7, ease: "back.out(2.2)",
+  }, "-=0.7")
   .to(".hero-row .hero-glyph", {
     y: 0, opacity: 1, duration: 0.6, ease: "back.out(1.6)", stagger: 0.08,
-  }, "-=0.4")
+  }, "-=0.5")
   .to(".hero-stack .lede .word-inner", {
     y: 0, opacity: 1, duration: 1, ease: "expo.out", stagger: 0.03,
   }, "-=0.4");
+
+/* Idle float on panda */
+gsap.to(".hero-photo", {
+  y: -10, duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut", delay: 1.8,
+});
 
 gsap.to(".hero-stack", {
   y: -120, opacity: 0, ease: "none",
@@ -154,7 +187,16 @@ document.querySelectorAll(".master").forEach((sec) => {
       scrub: 0.8,
     },
   });
-  tl.to(".master--tigress .m-kanji", { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 0)
+  tl.to(".master--tigress .m-photo-mask", {
+      clipPath: "inset(0% 0% 0% 0%)",
+      duration: 1, ease: "power2.out",
+    }, 0)
+    .to(".master--tigress .m-photo-mask img", {
+      scale: 1, ease: "none", duration: 1.6,
+    }, 0)
+    .to(".master--tigress .m-stamp", {
+      opacity: 1, scale: 1, rotate: -8, duration: 0.4, ease: "back.out(2)",
+    }, 0.7)
     .to(".master--tigress .claw", {
       strokeDashoffset: 0,
       duration: 1, ease: "power2.inOut",
@@ -162,17 +204,21 @@ document.querySelectorAll(".master").forEach((sec) => {
     }, 0.25);
 }
 
-/* idle: subtle kanji pulse for tigress */
-gsap.to(".master--tigress .m-kanji", {
-  scale: 1.04, duration: 2.4, repeat: -1, yoyo: true, ease: "sine.inOut",
-});
-
-/* ── II · MONKEY — bamboo grove parallax ───────────────── */
+/* ── II · MONKEY — bamboo grove parallax + photo wipe ──── */
 {
-  gsap.to(".master--monkey .m-kanji", {
-    opacity: 1, scale: 1, ease: "power2.out",
-    scrollTrigger: { trigger: ".master--monkey", start: "top 70%", toggleActions: "play none none reverse" },
+  const tlPhoto = gsap.timeline({
+    scrollTrigger: { trigger: ".master--monkey", start: "top 75%", end: "bottom 30%", scrub: 0.8 },
   });
+  tlPhoto
+    .to(".master--monkey .m-photo-mask", {
+      clipPath: "inset(0% 0% 0% 0%)", duration: 1, ease: "power2.out",
+    }, 0)
+    .to(".master--monkey .m-photo-mask img", {
+      scale: 1.02, ease: "none", duration: 1.6,
+    }, 0)
+    .to(".master--monkey .m-stamp", {
+      opacity: 1, scale: 1, rotate: -8, duration: 0.4, ease: "back.out(2)",
+    }, 0.7);
 
   /* bamboo stalks parallax at different speeds */
   const speeds = [60, -80, 40, -100, 30];
@@ -215,16 +261,23 @@ gsap.to(".master--tigress .m-kanji", {
       pinSpacing: true,
     },
   });
-  tl.fromTo(".master--mantis .m-kanji",
-    { opacity: 1, scale: 0.05, rotate: -10 },
-    { scale: 1, rotate: 0, duration: 1, ease: "power2.inOut" }, 0
-  ).fromTo(".master--mantis .dew span",
-    { opacity: 0, scale: 0 },
-    { opacity: 0.85, scale: 1, duration: 0.6, stagger: { amount: 0.6, from: "random" } }, 0.2
-  ).fromTo(".master--mantis .m-copy",
-    { opacity: 0, y: 40 },
-    { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.5
-  );
+  tl.to(".master--mantis .m-photo-mask", {
+      clipPath: "inset(0% 0% 0% 0%)",
+      duration: 1, ease: "power2.out",
+    }, 0)
+    .to(".master--mantis .m-photo-mask img", {
+      scale: 1.04, ease: "none", duration: 1.6,
+    }, 0)
+    .to(".master--mantis .m-stamp", {
+      opacity: 1, scale: 1, rotate: -8, duration: 0.4, ease: "back.out(2)",
+    }, 0.6)
+    .fromTo(".master--mantis .dew span",
+      { opacity: 0, scale: 0 },
+      { opacity: 0.85, scale: 1, duration: 0.6, stagger: { amount: 0.6, from: "random" } }, 0.3
+    ).fromTo(".master--mantis .m-copy",
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.5
+    );
 }
 
 /* ── IV · VIPER — long curve draws across screen ──────── */
@@ -237,12 +290,18 @@ gsap.to(".master--tigress .m-kanji", {
       scrub: 0.8,
     },
   });
-  tl.to(".master--viper .m-kanji", { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 0)
+  tl.to(".master--viper .m-photo-mask", {
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      duration: 1, ease: "power2.out",
+    }, 0)
+    .to(".master--viper .m-photo-mask img", {
+      scale: 1, ease: "none", duration: 1.6,
+    }, 0)
+    .to(".master--viper .m-stamp", {
+      opacity: 1, scale: 1, rotate: -8, duration: 0.4, ease: "back.out(2)",
+    }, 0.7)
     .to(".master--viper .viper-curve path", {
-      strokeDashoffset: 0,
-      ease: "none",
-      duration: 1,
-      stagger: 0.1,
+      strokeDashoffset: 0, ease: "none", duration: 1, stagger: 0.1,
     }, 0);
 }
 
@@ -273,10 +332,19 @@ gsap.to(".master--tigress .m-kanji", {
     }
   }
 
-  gsap.to(".master--crane .m-kanji", {
-    opacity: 1, scale: 1, ease: "power2.out",
-    scrollTrigger: { trigger: ".master--crane", start: "top 70%", toggleActions: "play none none reverse" },
+  const cranePhoto = gsap.timeline({
+    scrollTrigger: { trigger: ".master--crane", start: "top 75%", end: "bottom 35%", scrub: 0.8 },
   });
+  cranePhoto
+    .to(".master--crane .m-photo-mask", {
+      scale: 1, rotate: 0, duration: 1, ease: "expo.out",
+    }, 0)
+    .to(".master--crane .m-photo-mask img", {
+      scale: 1.04, ease: "none", duration: 1.8,
+    }, 0)
+    .to(".master--crane .m-stamp", {
+      opacity: 1, scale: 1, rotate: -8, duration: 0.5, ease: "back.out(2)",
+    }, 0.7);
 
   /* clouds drift horizontally on scroll */
   const speeds = [180, -120, 220, -80];

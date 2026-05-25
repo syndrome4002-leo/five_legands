@@ -498,14 +498,162 @@ body {
   will-change: transform, opacity;
 }
 
+/* ░░ Photos (added) ░░ */
+
+/* HERO panda portrait */
+.hero-photo {
+  position: relative;
+  width: clamp(220px, 22vw, 320px);
+  aspect-ratio: 1 / 1;
+  margin: 8px auto 32px;
+  perspective: 1200px;
+}
+.hero-photo-mask {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--ink);
+  transform: scale(0) rotate(-18deg);
+  will-change: transform;
+  box-shadow:
+    0 0 70px rgba(232, 85, 28, 0.25),
+    0 30px 60px -30px rgba(0,0,0,0.7);
+  border: 2px solid rgba(232, 85, 28, 0.3);
+}
+.hero-photo-mask img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: saturate(0.95) contrast(1.05);
+  transform: scale(1.18);
+  will-change: transform;
+}
+.hero-stamp {
+  position: absolute;
+  right: -6px; top: 4%;
+  width: clamp(48px, 5vw, 64px);
+  height: clamp(48px, 5vw, 64px);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--tigress);
+  color: var(--paper);
+  font-family: var(--brush);
+  font-size: clamp(24px, 2.4vw, 32px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.25);
+  transform: scale(0) rotate(45deg);
+  opacity: 0;
+}
+
+/* MASTER photos (replaces .m-kanji) */
+.m-photo {
+  position: relative;
+  z-index: 3;
+  margin: 0;
+  perspective: 1200px;
+}
+.m-photo--left  { justify-self: start; }
+.m-photo--right { justify-self: end; }
+.m-photo--center {
+  justify-self: center;
+  width: min(100%, 1100px);
+}
+.m-photo-mask {
+  width: clamp(280px, 32vw, 460px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.4);
+  box-shadow: 0 30px 70px -30px rgba(0,0,0,0.8);
+  will-change: clip-path, transform;
+}
+.m-photo--center .m-photo-mask {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 6px;
+}
+.m-photo-mask img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: saturate(0.92) contrast(1.05);
+  transform: scale(1.18);
+  will-change: transform;
+}
+
+/* Initial mask states (animated by GSAP) */
+.m-photo-mask--down   { clip-path: inset(100% 0% 0% 0%); }
+.m-photo-mask--right  { clip-path: inset(0% 100% 0% 0%); }
+.m-photo-mask--slit   { clip-path: inset(48% 0% 48% 0%); }
+.m-photo-mask--diag   { clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%); }
+.m-photo-mask--circle {
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  transform: scale(0);
+}
+
+/* Kanji stamp (small corner accent) */
+.m-stamp {
+  position: absolute;
+  right: -18px; top: -18px;
+  width: clamp(56px, 5vw, 72px);
+  height: clamp(56px, 5vw, 72px);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--brush);
+  font-size: clamp(28px, 2.6vw, 38px);
+  color: var(--paper);
+  border-radius: 50%;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.45), inset 0 0 10px rgba(0,0,0,0.3);
+  transform: scale(0) rotate(45deg);
+  opacity: 0;
+  z-index: 4;
+}
+.master--tigress .m-stamp { background: var(--tigress); }
+.master--monkey  .m-stamp { background: var(--monkey); }
+.master--mantis  .m-stamp { background: var(--mantis); color: #0a1a12; }
+.master--viper   .m-stamp { background: var(--viper); }
+.master--crane   .m-stamp { background: var(--crane); color: #0a1a20; }
+
+/* MANTIS — photo becomes the centered background; text overlays */
+.master--mantis .m-inner--center {
+  grid-template-columns: 1fr;
+  position: relative;
+  min-height: 100vh;
+}
+.master--mantis .m-photo--center {
+  position: absolute;
+  inset: 8% 6%;
+  width: auto;
+  height: auto;
+  z-index: 1;
+}
+.master--mantis .m-photo--center .m-photo-mask {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+.master--mantis .m-photo--center .m-photo-mask::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(13,10,8,0.7) 0%, transparent 32%, transparent 68%, rgba(13,10,8,0.8) 100%);
+  pointer-events: none;
+}
+.master--mantis .m-copy--center {
+  position: relative;
+  z-index: 3;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.8);
+  padding: 80px 24px;
+}
+
 /* ░░ Responsive ░░ */
 @media (max-width: 900px) {
   .master { padding: 100px 24px; }
-  .m-inner, .m-inner.reverse { grid-template-columns: 1fr; gap: 24px; }
+  .m-inner, .m-inner.reverse { grid-template-columns: 1fr; gap: 32px; }
   .m-copy--right, .m-copy--left { justify-self: center; text-align: center; }
-  .m-kanji--left, .m-kanji--right { justify-self: center; }
+  .m-photo--left, .m-photo--right { justify-self: center; }
   .nav { padding: 20px 24px; }
   .indicator { right: 12px; gap: 12px; }
   .ind-dot { width: 28px; height: 28px; font-size: 13px; }
   .hero-row { gap: 14px; }
+  .hero-photo { width: clamp(180px, 50vw, 240px); }
+  .m-photo-mask { width: clamp(240px, 70vw, 380px); }
+  .m-stamp { right: -10px; top: -10px; }
 }
